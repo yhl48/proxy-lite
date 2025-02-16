@@ -2,7 +2,7 @@
 
 A mini, open-weights version of our Proxy assistant.
 
-![Proxy-Lite Demo](demo.gif)
+![Proxy-Lite Demo](assets/demo.gif)
 
 ---
 
