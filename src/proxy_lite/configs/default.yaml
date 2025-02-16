@@ -1,0 +1,20 @@
+environment:
+  name: webbrowser
+  annotate_image: true
+  screenshot_delay: 2.0
+  viewport_width: 1280
+  viewport_height: 1920
+  include_poi_text: true
+  headless: false
+  homepage: https://www.google.co.uk
+solver:
+  name: simple
+  agent:
+    name: proxy_lite
+    client:
+      name: convergence
+      model_id: convergence-ai/subset-distill-tools-7b-15-02-2025
+      api_base: http://slurm1-a3nodeset-4-1:8002/v1
+local_view: true
+task_timeout: 1800
+verbose: true
