@@ -3,7 +3,7 @@
   <img src="assets/proxy-lite.png" alt="Proxy Lite logo" width="400" height="auto" style="margin-bottom: 20px;" />
 
   <h2>
-    A mini, open-weights version of our Proxy assistant.
+    A mini, open-weights, version of our Proxy assistant.
   </h2>
 
 
@@ -35,7 +35,7 @@
 
 
 <div align="center">
-![Proxy Lite Demo](assets/demo.gif)
+     <img src="assets/demo.gif" alt="Proxy Lite Demo" />
 </div>
 
 
