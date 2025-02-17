@@ -208,8 +208,8 @@ if __name__ == "__main__":
             "environment": {
                 "name": "webbrowser",
                 "homepage": "https://www.google.com",
-                "viewport_width": 1920,
-                "viewport_height": 1080,
+                "viewport_width": 1280,
+                "viewport_height": 1920,
                 "screenshot_delay": 1,
                 "headless": False,
             },
@@ -219,10 +219,8 @@ if __name__ == "__main__":
                     "name": "proxy_lite",
                     "client": {
                         "name": "convergence",
-                        "model_id": "convergence-ai/all-distill-tools-7b-16-02-2025",
-                        "api_base": "http://slurm1-a3nodeset-4-1:8009/v1",
-                        #     # "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
-                        #     # "api_base": "http://0.0.0.0:8000/v1",
+                        "model_id": "convergence-ai/proxy-lite",
+                        "api_base": "https://convergence-ai-demo-api.hf.space/v1",
                     },
                 },
             },
@@ -236,10 +234,6 @@ if __name__ == "__main__":
     logger.info(f"🤖 [bold purple]Config:[/] {config}")
 
     runner = Runner(config=config)
-    result = asyncio.run(
-        runner.run(
-            "Tell me the tesla stock price"  # noqa: E501
-        )
-    )
+    result = asyncio.run(runner.run("Tell me the tesla stock price."))
     print(runner.run_result)
     print(runner.complete)

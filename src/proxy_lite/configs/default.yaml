@@ -13,8 +13,8 @@ solver:
     name: proxy_lite
     client:
       name: convergence
-      model_id: convergence-ai/subset-distill-tools-7b-15-02-2025
-      api_base: http://slurm1-a3nodeset-4-1:8002/v1
+      model_id: convergence-ai/proxy-lite
+      api_base: https://convergence-ai-demo-api.hf.space/v1
 local_view: true
 task_timeout: 1800
 verbose: true
