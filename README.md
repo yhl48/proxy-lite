@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="assets/proxy-lite.png" alt="Proxy Lite logo" width="400" height="auto" style="margin-bottom: 20px;" />
+  <img src="assets/proxy-lite.png" alt="Proxy Lite logo" width="600" height="auto" style="margin-bottom: 20px;" />
 
   <h2>
     A mini, open-weights, version of our Proxy assistant.
@@ -84,7 +84,7 @@ By default, Proxy Lite will point to an endpoint set up on HuggingFace spaces. T
 We recommend hosting your own endpoint with vLLM, you can use the following command:
 
 ```bash
-vllm serve --model convergence-ai/proxy-lite-7b \
+vllm serve --model convergence-ai/proxy-lite \
     --trust-remote-code \
     --enable-auto-tool-choice \
     --tool-call-parser hermes \
@@ -93,7 +93,7 @@ vllm serve --model convergence-ai/proxy-lite-7b \
 
 The tool arguments are **very important** for parsing the tool calls from the model appropriately.
 
-> **Important:** To run this, install vLLM and transformers with `uv sync --all-extras`. `Qwen-2.5-VL` Support in `transformers` is not yet available in the latest release so is done from source.
+> **Important:** To run this, install vLLM and transformers with `uv sync --all-extras`. Qwen-2.5-VL Support in `transformers` is not yet available in the latest release so is done from source.
 
 You can set the `api_base` to point to your local endpoint when calling Proxy Lite:
 
