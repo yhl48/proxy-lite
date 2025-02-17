@@ -44,6 +44,11 @@ You can directly run the proxy with:
 proxy "Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm."
 ```
 
+Alternatively you can run the local web ui with:
+
+```bash
+make app
+```
 
 ### Proxy-Lite Endpoint
 
