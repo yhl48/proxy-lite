@@ -29,7 +29,8 @@ def get_user_config(config_expander):
                 "client": {
                     "name": "convergence",
                     "model_id": "convergence-ai/subset-distill-tools-7b-15-02-2025",
-                    "api_base": "http://slurm1-a3nodeset-4-1:8002/v1",
+                    "model_id": "convergence-ai/proxy-lite",
+                    "api_base": "https://convergence-ai-demo-api.hf.space/v1",
                 },
             },
         },
@@ -62,6 +63,11 @@ def get_user_config(config_expander):
             )
 
         with col2:
+            config["environment"]["homepage"] = st.text_input(
+                "VLLM Server URL",
+                value=config["solver"]["agent"]["client"]["api_base"],
+                help="URL of a vllm server running proxy-lite",
+            )
             config["environment"]["screenshot_delay"] = st.slider(
                 "Screenshot Delay (seconds)",
                 min_value=0.5,
