@@ -164,6 +164,6 @@ Actions in an environment are defined through available tool calls, which in the
 
 If you want to not use this set-of-marks approach, you can set the `no_pois_in_image` flag to `True`, and the `include_poi_text` flag to `False` in the `EnvironmentConfig`. This way the model will only see the original image, and not the annotated image with these points-of-interest (POIs). In this case, you would want to update the `BrowserTool` to interact with pixel coordinates instead of the `mark_id`s.
 
-
+**Note:** We use `playwright_stealth` to lower the chance of detection by anti-bot services, but this isn't foolproof and Proxy Lite may still get blocked with captchas or other anti-bot measures, especially when using the `headless` flag. We recommend using network proxies to avoid this issue.
 
 
