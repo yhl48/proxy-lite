@@ -8,19 +8,26 @@ dependencies = [
     "omegaconf>=2.3.0",
     "openai>=1.61.1",
     "opencv-python>=4.11.0.86",
+    "opencv-python-headless>=4.11.0.86",
     "playwright-stealth>=1.0.6",
     "playwright>=1.50.0",
     "pydantic>=2.10.6",
     "rich>=13.9.4",
     "setuptools>=75.8.0",
     "tenacity>=9.0.0",
-    "torch>=2.6.0",
-    "torchvision>=0.21.0",
+    "torch>=2.5.1",
+    "torchvision>=0.20.1",
     "streamlit>=1.40.2",
 ]
 
 [project.scripts]
 proxy = "proxy_lite.cli:main"
+
+[project.optional-dependencies]
+serving = [
+    "transformers",
+    "vllm==0.7.2",
+]
 
 [build-system]
 requires = ["setuptools"]
@@ -51,4 +58,7 @@ extend-immutable-calls = [
     "fastapi.Query",
     "fastapi.params.Query",
 ]
+
+[tool.uv.sources]
+transformers = { git = "https://github.com/huggingface/transformers.git", rev = "336dc69d63d56f232a183a3e7f52790429b871ef" }
 
