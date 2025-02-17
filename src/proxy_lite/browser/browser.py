@@ -5,6 +5,7 @@ from contextlib import AsyncExitStack
 from pathlib import Path
 from typing import Literal, Optional, Self
 
+import platform
 from playwright.async_api import Browser, BrowserContext, Page, Playwright, async_playwright
 from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_async
@@ -371,8 +372,13 @@ class BrowserSession:
         if existing_text.strip():
             # Clear existing text only if it exists
             await self.click(mark_id)
-            await self.current_page.keyboard.press("Control+Home")
-            await self.current_page.keyboard.press("Control+Shift+End")
+            if platform.system() == "Darwin":  # selecting all text is OS-specific
+                await self.click(mark_id)
+                await self.current_page.keyboard.press("Meta+a")
+                await self.current_page.keyboard.press("Backspace")
+            else:
+                await self.current_page.keyboard.press("Control+Home")
+                await self.current_page.keyboard.press("Control+Shift+End")
             await self.current_page.keyboard.press("Backspace")
 
 
