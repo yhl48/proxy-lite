@@ -1,12 +1,12 @@
 <div align="center">
 
-  <img src="assets/proxy-lite.png" alt="Proxy Lite logo" width="400" height="auto" />
+  <img src="assets/proxy-lite.png" alt="Proxy Lite logo" width="400" height="auto" style="margin-bottom: 20px;" />
 
-  <p>
+  <h2>
     A mini, open-weights version of our Proxy assistant.
-  </p>
-  
-  
+  </h2>
+
+
 <!-- Badges -->
 <p>
   <a href="https://github.com/convergence-ai/proxy-lite/contributors">
@@ -34,11 +34,10 @@
 
 
 
-
+<div align="center">
 ![Proxy Lite Demo](assets/demo.gif)
+</div>
 
-
----
 
 
 ## Installation
