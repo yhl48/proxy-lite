@@ -6,9 +6,8 @@ A mini, open-weights version of our Proxy assistant.
 
 ---
 
-## Getting Started
 
-### Installation
+## Installation
 
 Clone the repository: 
 
@@ -25,6 +24,7 @@ make proxy
 Or do it manually:
 
 ```bash
+pip install uv
 uv venv --python 3.11 --python-preference managed
 uv sync
 uv pip install -e .
@@ -32,7 +32,7 @@ playwright install
 ```
 
 
-### Usage
+## Usage
 
 ```bash
 proxy --help
@@ -70,6 +70,57 @@ or by setting the environment variable:
 export PROXY_LITE_API_BASE=http://localhost:8008/v1
 ```
 
+### Scaffolding Proxy-Lite in Python
+
+We use the `RunnerConfig` to control the setup of the task.
+The library is designed to be modular and extendable, you can easily swap the environment, solver, or agent.
+
+Example:
+```python
+import asyncio
+from proxy_lite import Runner, RunnerConfig
+
+config = RunnerConfig.from_dict(
+    {
+        "environment": {
+            "name": "webbrowser",
+            "homepage": "https://www.google.com",
+            "headless": True, # Don't show the browser
+        },
+        "solver": {
+            "name": "simple",
+            "agent": {
+                "name": "proxy_lite",
+                "client": {
+                    "name": "convergence",
+                    "model_id": "convergence-ai/proxy-lite",
+                    "api_base": "https://convergence-ai-demo-api.hf.space/v1",
+                },
+            },
+        },
+        "max_steps": 50,
+        "action_timeout": 1800,
+        "environment_timeout": 1800,
+        "task_timeout": 18000,
+        "logger_level": "DEBUG",
+    },
+)
+
+proxy = Runner(config=config)
+result = asyncio.run(
+    proxy.run("Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm.")
+)
+```
+
+### Webbrowser Environment
+
+The `webbrowser` environment is a simple environment that uses the `playwright` library to navigate the web.
+
+We launch a Chromium browser and navigate to the `homepage` provided in the `RunnerConfig`.
+
+Actions in an environment are defined through available tool calls, which in the browser case are set as default in the `BrowserTool` class. This allows the model to click, type, etc. at relevant `mark_id` elements on the page. These elements are extracted using JavaScript injected into the page in order to make interaction easier for the models. 
+
+If you want to not use this set-of-marks approach, you can set the `no_pois_in_image` flag to `True`, and the `include_poi_text` flag to `False` in the `EnvironmentConfig`. This way the model will only see the original image, and not the annotated image with these points-of-interest (POIs). In this case, you would want to update the `BrowserTool` to interact with pixel coordinates instead of the `mark_id`s.
 
 
 
