@@ -20,6 +20,7 @@ def get_user_config(config_expander):
             "include_poi_text": True,
             "homepage": "https://www.google.com",
             "keep_original_image": False,
+            "headless": False,
         },
         "solver": {
             "name": "simple",
@@ -166,9 +167,8 @@ async def run_task_async(
             for idx, (action, img, som) in enumerate(zip(all_steps, all_screenshots, all_soms, strict=False)):
                 st.write(f"**Step {idx + 1}**")
                 st.image(img, use_container_width=True)
-                with st.expander("points of interest", expanded=False):
-                    st.markdown(som)
-                st.write(f"**Action:** {action}")
+                st.markdown(som)
+                st.write(action)
     action_placeholder.write(" ")
     status_placeholder.write(f"✨ **Result:** {latest_step}")
 
@@ -222,9 +222,9 @@ def main():
                     ),
                 )
 
-                st.success("Wish granted!", icon="✨")
+                st.success("Task completed!", icon="✨")
             else:
-                st.error("Please make a wish first!")
+                st.error("Please give a task first!")
 
 
 if __name__ == "__main__":
