@@ -20,7 +20,7 @@ def get_user_config(config_expander):
             "include_poi_text": True,
             "homepage": "https://www.google.com",
             "keep_original_image": False,
-            "headless": False,  # without proxies its reccomended to use headless mode to avoid getting bot blocked
+            "headless": False,  # without proxies headless mode often results in getting bot blocked
         },
         "solver": {
             "name": "simple",
