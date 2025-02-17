@@ -85,7 +85,7 @@ make app
 ### Proxy Lite Endpoint
 
 By default, Proxy Lite will point to an endpoint set up on HuggingFace spaces.
-> ‼ This is a demo endpoint and is not suitable for production, or even frequent hobbyist, use; it may be very slow when under heavy load.
+> ❗ This is a demo endpoint and is not suitable for production, or even frequent hobbyist, use; it may be very slow when under even moderate load.
 
 We recommend hosting your own endpoint with vLLM, you can use the following command:
 
