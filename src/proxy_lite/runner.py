@@ -55,7 +55,7 @@ class RunnerConfig(BaseModel):
     solver: SolverConfigTypes
 
     save_every_step: bool = True
-    max_steps: int = 100
+    max_steps: int = 50
     action_timeout: float = 60.0
     environment_timeout: float = 30.0
     task_timeout: float = 1800.0
