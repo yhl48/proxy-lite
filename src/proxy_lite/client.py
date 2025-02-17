@@ -73,7 +73,7 @@ class BaseClient(BaseModel, ABC):
 class OpenAIClientConfig(BaseClientConfig):
     name: Literal["openai"] = "openai"
     model_id: str = "gpt-4o"
-    api_key: str = os.environ["OPENAI_API_KEY"]
+    api_key: str = os.environ.get("OPENAI_API_KEY")
 
 
 class OpenAIClient(BaseClient):
@@ -137,6 +137,7 @@ class ConvergenceClient(OpenAIClient):
     @cached_property
     def external_client(self) -> AsyncOpenAI:
         return AsyncOpenAI(
+            api_key=self.config.api_key,
             base_url=self.config.api_base,
             http_client=self.http_client,
         )
