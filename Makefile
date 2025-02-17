@@ -6,3 +6,6 @@ proxy:
 	uv sync
 	uv pip install -e .
 	playwright install
+
+app:
+	streamlit run src/proxy_lite/app.py
