@@ -168,7 +168,7 @@ class Runner(BaseModel):
         yield run
 
     async def run(self, task: str) -> Run:
-        async for run in self.run_generator(task):  # noqa: B007
+        async for run in self.run_generator(task):
             self._run = run
         return run
 
