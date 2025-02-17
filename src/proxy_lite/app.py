@@ -28,7 +28,6 @@ def get_user_config(config_expander):
                 "name": "proxy_lite",
                 "client": {
                     "name": "convergence",
-                    "model_id": "convergence-ai/subset-distill-tools-7b-15-02-2025",
                     "model_id": "convergence-ai/proxy-lite",
                     "api_base": "https://convergence-ai-demo-api.hf.space/v1",
                 },
@@ -63,7 +62,7 @@ def get_user_config(config_expander):
             )
 
         with col2:
-            config["environment"]["homepage"] = st.text_input(
+            config["solver"]["agent"]["client"]["api_base"] = st.text_input(
                 "VLLM Server URL",
                 value=config["solver"]["agent"]["client"]["api_base"],
                 help="URL of a vllm server running proxy-lite",
