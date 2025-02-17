@@ -28,6 +28,7 @@ class WebBrowserEnvironmentConfig(BaseEnvironmentConfig):
     browserbase_timeout: int = 7200
     headless: bool = True
     keep_original_image: bool = False
+    no_pois_in_image: bool = False
 
 
 @Environments.register_environment("webbrowser")
@@ -78,8 +79,10 @@ class WebBrowserEnvironment(BaseEnvironment):
         original_img, annotated_img = await self.browser.screenshot(
             delay=self.config.screenshot_delay,
         )
-
-        base64_image = base64.b64encode(annotated_img).decode("utf-8")
+        if self.config.no_pois_in_image:
+            base64_image = base64.b64encode(original_img).decode("utf-8")
+        else:
+            base64_image = base64.b64encode(annotated_img).decode("utf-8")
 
         html_content = await self.browser.current_page.content() if self.config.include_html else None
 
