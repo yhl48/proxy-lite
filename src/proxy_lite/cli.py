@@ -1,10 +1,12 @@
 import argparse
 import asyncio
+import base64
 import os
 from pathlib import Path
 from typing import Optional
 
 from proxy_lite import Runner, RunnerConfig
+from proxy_lite.gif_maker import create_run_gif
 from proxy_lite.logger import logger
 
 
@@ -35,7 +37,21 @@ def do_command(args):
     if args.viewport_height:
         config.viewport_height = args.viewport_height
     o = Runner(config=config)
-    asyncio.run(o.run(do_text))
+    result = asyncio.run(o.run(do_text))
+
+    final_screenshot = result.observations[-1].info["original_image"]
+    folder_path = Path(__file__).parent.parent.parent / "screenshots"
+    folder_path.mkdir(parents=True, exist_ok=True)
+    path = folder_path / f"{result.run_id}.png"
+    with open(path, "wb") as f:
+        f.write(base64.b64decode(final_screenshot))
+    logger.info(f"🤖 Final screenshot saved to {path}")
+
+    gif_folder_path = Path(__file__).parent.parent.parent / "gifs"
+    gif_folder_path.mkdir(parents=True, exist_ok=True)
+    gif_path = gif_folder_path / f"{result.run_id}.gif"
+    create_run_gif(result, gif_path, duration=1500)
+    logger.info(f"🤖 GIF saved to {gif_path}")
 
 
 def main():
