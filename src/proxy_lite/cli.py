@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from proxy_lite import Runner, RunnerConfig
-from proxy_lite.gif_marker import create_run_gif
+from proxy_lite.gif_maker import create_run_gif
 from proxy_lite.logger import logger
 
 
