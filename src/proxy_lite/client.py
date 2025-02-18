@@ -15,7 +15,7 @@ from proxy_lite.history import MessageHistory
 from proxy_lite.logger import logger
 from proxy_lite.serializer import (
     BaseSerializer,
-    OpenAISerializer,
+    OpenAICompatibleSerializer,
 )
 from proxy_lite.tools import Tool
 
@@ -78,7 +78,7 @@ class OpenAIClientConfig(BaseClientConfig):
 
 class OpenAIClient(BaseClient):
     config: OpenAIClientConfig
-    serializer: ClassVar[OpenAISerializer] = OpenAISerializer()
+    serializer: ClassVar[OpenAICompatibleSerializer] = OpenAICompatibleSerializer()
 
     @cached_property
     def external_client(self) -> AsyncOpenAI:
@@ -119,14 +119,14 @@ class ConvergenceClientConfig(BaseClientConfig):
 
 class ConvergenceClient(OpenAIClient):
     config: ConvergenceClientConfig
-    serializer: ClassVar[OpenAISerializer] = OpenAISerializer()
+    serializer: ClassVar[OpenAICompatibleSerializer] = OpenAICompatibleSerializer()
     _model_validated: bool = False
 
     async def _validate_model(self) -> None:
         try:
-            await self.external_client.beta.chat.completions.parse(
-                model=self.config.model_id,
-                messages=[{"role": "user", "content": "Hello"}],
+            response = await self.external_client.models.list()
+            assert self.config.model_id in [model.id for model in response.data], (
+                f"Model {self.config.model_id} not found in {response.data}"
             )
             self._model_validated = True
             logger.debug(f"Model {self.config.model_id} validated and connected to cluster")

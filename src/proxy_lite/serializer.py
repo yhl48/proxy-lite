@@ -25,7 +25,7 @@ class BaseSerializer(BaseModel, ABC):
     def serialize_tools(self, tools: list[Tool]) -> list[dict]: ...
 
 
-class OpenAISerializer(BaseSerializer):
+class OpenAICompatibleSerializer(BaseSerializer):
     def serialize_messages(self, message_history: MessageHistory) -> list[dict]:
         return message_history.to_dict(exclude={"label"})
 
