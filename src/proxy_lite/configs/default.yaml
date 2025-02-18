@@ -18,4 +18,6 @@ solver:
       api_base: https://convergence-ai-demo-api.hf.space/v1
 local_view: true
 task_timeout: 1800
+environment_timeout: 1800
+action_timeout: 1800
 verbose: true

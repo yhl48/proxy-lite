@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from proxy_lite import Runner, RunnerConfig
+from proxy_lite.gif_marker import create_run_gif
 from proxy_lite.logger import logger
 
 
@@ -45,6 +46,12 @@ def do_command(args):
     with open(path, "wb") as f:
         f.write(base64.b64decode(final_screenshot))
     logger.info(f"🤖 Screenshot saved to {path}")
+
+    gif_folder_path = Path(__file__).parent.parent.parent / "gifs"
+    gif_folder_path.mkdir(parents=True, exist_ok=True)
+    gif_path = gif_folder_path / f"{result.run_id}.gif"
+    create_run_gif(result, gif_path, duration=1500)
+    logger.info(f"🤖 GIF saved to {gif_path}")
 
 
 def main():
