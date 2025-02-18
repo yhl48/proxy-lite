@@ -10,7 +10,7 @@ from proxy_lite.recorder import Run
 
 
 def create_run_gif(
-    run: Run, output_path: str, white_panel_width: int = 300, duration: int = 2000, resize_factor: int = 4
+    run: Run, output_path: str, white_panel_width: int = 300, duration: int = 1500, resize_factor: int = 4
 ) -> None:
     """
     Generate a gif from the Run object's history.
@@ -43,7 +43,7 @@ def create_run_gif(
             image_bytes = base64.b64decode(image_data)
             obs_img = Image.open(BytesIO(image_bytes)).convert("RGB")
 
-            # scale the image down to 1/4 of its original size
+            # scale the image down
             obs_img = obs_img.resize((obs_img.width // resize_factor, obs_img.height // resize_factor))
 
             # Check if the next record is an Action and extract its text if available
@@ -62,7 +62,7 @@ def create_run_gif(
             thinking_content = thinking_match.group(1).strip() if thinking_match else None
 
             if observation_content and thinking_content:
-                action_text = f"Observation: {observation_content}\n\nThinking: {thinking_content}"
+                action_text = f"**OBSERVATION**\n{observation_content}\n\n**THINKING**\n{thinking_content}"
 
             # Create a white panel (same height as the observation image)
             panel = Image.new("RGB", (white_panel_width, obs_img.height), "white")
@@ -111,8 +111,6 @@ def create_run_gif(
 
 # Example usage:
 if __name__ == "__main__":
-    # This is a simple example to demonstrate usage.
-    # In practice, replace this with your actual Run object.
     from proxy_lite.recorder import Run
 
     dummy_run = Run.load("0abdb4cb-f289-48b0-ba13-35ed1210f7c1")
