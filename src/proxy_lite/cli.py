@@ -45,7 +45,7 @@ def do_command(args):
     path = folder_path / f"{result.run_id}.png"
     with open(path, "wb") as f:
         f.write(base64.b64decode(final_screenshot))
-    logger.info(f"🤖 Screenshot saved to {path}")
+    logger.info(f"🤖 Final screenshot saved to {path}")
 
     gif_folder_path = Path(__file__).parent.parent.parent / "gifs"
     gif_folder_path.mkdir(parents=True, exist_ok=True)
