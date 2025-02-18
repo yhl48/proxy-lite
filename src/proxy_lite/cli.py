@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import base64
 import os
 from pathlib import Path
 from typing import Optional
@@ -35,7 +36,15 @@ def do_command(args):
     if args.viewport_height:
         config.viewport_height = args.viewport_height
     o = Runner(config=config)
-    asyncio.run(o.run(do_text))
+    result = asyncio.run(o.run(do_text))
+
+    final_screenshot = result.observations[-1].info["original_image"]
+    folder_path = Path(__file__).parent.parent.parent / "screenshots"
+    folder_path.mkdir(parents=True, exist_ok=True)
+    path = folder_path / f"{result.run_id}.png"
+    with open(path, "wb") as f:
+        f.write(base64.b64decode(final_screenshot))
+    logger.info(f"🤖 Screenshot saved to {path}")
 
 
 def main():

@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 import json
 import os
-import sys
 import uuid
 from pathlib import Path
 from typing import Any, Optional, Self
@@ -80,7 +79,7 @@ class DataRecorder:
         self.local_folder = local_folder
 
     def initialise_run(self, task: str) -> Run:
-        self.local_folder = Path(os.path.abspath(".")) / "local_trajectories"
+        self.local_folder = Path(__file__).parent.parent.parent / "local_trajectories"
         os.makedirs(self.local_folder, exist_ok=True)
         return Run.initialise(task)
 

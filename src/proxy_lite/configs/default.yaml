@@ -7,6 +7,7 @@ environment:
   include_poi_text: true
   headless: false
   homepage: https://www.google.co.uk
+  keep_original_image: true
 solver:
   name: simple
   agent:
