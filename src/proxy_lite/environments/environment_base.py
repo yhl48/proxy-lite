@@ -84,7 +84,7 @@ class BaseEnvironment(BaseModel, ABC):
         for tool in self.tools:
             if hasattr(tool, function["name"]):
                 arguments = json.loads(function["arguments"])
-                if type(arguments) == str:
+                if isinstance(arguments, str):
                     arguments = json.loads(arguments)
                 return await getattr(tool, function["name"])(
                     **arguments,

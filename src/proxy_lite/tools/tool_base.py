@@ -2,7 +2,7 @@ import inspect
 from functools import cached_property, wraps
 from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class Tool:

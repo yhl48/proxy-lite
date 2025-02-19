@@ -20,7 +20,7 @@ def get_user_config(config_expander):
             "include_poi_text": True,
             "homepage": "https://www.google.com",
             "keep_original_image": False,
-            "headless": False,  # without proxies headless mode often results in getting bot blocked
+            "headless": False,  # without proxies headless mode often results in getting bot blocked
         },
         "solver": {
             "name": "simple",
@@ -151,9 +151,12 @@ async def run_task_async(
         # Update status with latest step
         if run.actions:
             latest_step = run.actions[-1].text
-            latest_step += "".join([
-                f'<tool_call>{{"name": {tool_call.function["name"]}, "arguments": {tool_call.function["arguments"]}}}</tool_call>' for tool_call in run.actions[-1].tool_calls
-            ])
+            latest_step += "".join(
+                [
+                    f'<tool_call>{{"name": {tool_call.function["name"]}, "arguments": {tool_call.function["arguments"]}}}</tool_call>'  # noqa: E501
+                    for tool_call in run.actions[-1].tool_calls
+                ]
+            )
             action_placeholder.write(f"⚡ **Latest Step:** {latest_step}")
             all_steps.append(latest_step)
 
