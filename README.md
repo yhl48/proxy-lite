@@ -248,7 +248,7 @@ We launch a Chromium browser and navigate to the `homepage` provided in the `Run
 
 Actions in an environment are defined through available tool calls, which in the browser case are set as default in the `BrowserTool` class. This allows the model to click, type, etc. at relevant `mark_id` elements on the page. These elements are extracted using JavaScript injected into the page in order to make interaction easier for the models. 
 
-**Note:** We use `playwright_stealth` to lower the chance of detection by anti-bot services, but this isn't foolproof and Proxy Lite may still get blocked with captchas or other anti-bot measures, especially when using the `headless` flag. We recommend using network proxies to avoid this issue.
+**Note:** We use `playwright_stealth` to lower the chance of detection by anti-bot services, but this isn't foolproof and Proxy Lite may still get blocked by captchas or other anti-bot measures, especially when using the `headless` flag. We recommend using network proxies to avoid this issue.
 
 
 ## Limitations
