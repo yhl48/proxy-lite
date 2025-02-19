@@ -173,3 +173,5 @@ cython_debug/
 logs/
 local_trajectories/
 screenshots/
+gifs/
+.DS_Store

@@ -154,6 +154,80 @@ result = asyncio.run(
 )
 ```
 
+The `Runner` sets the solver and environment off in a loop, like in a traditional reinforcement learning setup.
+
+<div align="center">
+  <img src="assets/loop.png" alt="Runner Loop" width="400" height="auto" style="margin-bottom: 20px;" />
+</div>
+
+
+When it comes to prompting Proxy Lite, the model expects a message history of the form:
+
+```python
+message_history = [
+    {
+        "role": "system", 
+        "content": "You are Proxy Lite...", # Full system prompt in src/proxy_lite/agents/proxy_lite_agent.py
+    }, # System prompt
+    {
+        "role": "user", 
+        "content": "Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm.",
+    }, # Set the task
+    {
+        "role": "user", 
+        "content": [
+            {"type": "image_url", "image_url": {base64_encoded_screenshot} },
+            {"type": "text", "text": "URL: https://www.google.com/ \n- [0] <a>About</a> \n- [1] <a>Store</a>...."}
+        ] # This is the observation from the environment
+    },
+]
+```
+This would then build up the message history, alternating between the assistant (action) and the user (observation), although for new calls, all the last observations other than the current one are discarded.
+
+The chat template will format this automatically, but also expects the appropriate `Tools` to be passed in so that the model is aware of the available actions. You can do this with `transformers`:
+
+```python
+from qwen_vl_utils import process_vision_info
+from transformers import AutoProcessor
+
+from proxy_lite.tools import ReturnValueTool, BrowserTool
+from proxy_lite.serializer import OpenAICompatableSerializer
+
+processor = AutoProcessor.from_pretrained("convergence-ai/proxy-lite")
+tools = OpenAICompatableSerializer().serialize_tools([ReturnValueTool(), BrowserTool(session=None)])
+
+templated_messages = processor.apply_chat_template(
+    message_history, tokenize=False, add_generation_prompt=True, tools=tools
+)
+
+image_inputs, video_inputs = process_vision_info(message_history)
+
+batch = processor(
+    text=[templated_messages],
+    images=image_inputs,
+    videos=video_inputs,
+    padding=True,
+    return_tensors="pt",
+)
+```
+
+Or you can send to the endpoint directly, which will handle the formatting:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_base="http://convergence-ai-demo-api.hf.space/v1")
+
+response = client.chat.completions.create(
+    model="convergence-ai/proxy-lite",
+    messages=message_history,
+    tools=tools,
+    tool_choice="auto",
+)
+```
+
+
+
 ### Webbrowser Environment
 
 The `webbrowser` environment is a simple environment that uses the `playwright` library to navigate the web.
@@ -167,3 +241,26 @@ If you want to not use this set-of-marks approach, you can set the `no_pois_in_i
 **Note:** We use `playwright_stealth` to lower the chance of detection by anti-bot services, but this isn't foolproof and Proxy Lite may still get blocked with captchas or other anti-bot measures, especially when using the `headless` flag. We recommend using network proxies to avoid this issue.
 
 
+## Limitations
+
+This model has not currently been designed to act as a full assistant that can interact with the user, and is instead designed to as a tool that will go out and *autonomously* complete the task set.
+As such, it will struggle with tasks that require credentials or user interaction such as actually purchasing items if you don't give all the required details in the prompt.
+
+
+## Future Work
+
+- [ ] Pixel level control over the mouse movements.
+- [ ] Full computer sandbox.
+- [ ] Multi agent support.
+
+## Citation
+
+
+```bibtex
+@article{proxy-lite,
+  title={Proxy Lite - A Mini, Open-weights, Autonomous Assistant},
+  author={Convergence AI},
+  url={https://github.com/convergence-ai/proxy-lite},
+  year={2025}
+}
+```
