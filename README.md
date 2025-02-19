@@ -99,7 +99,7 @@ vllm serve --model convergence-ai/proxy-lite \
 
 The tool arguments are **very important** for parsing the tool calls from the model appropriately.
 
-> **Important:** To serve the model locally, install vLLM and transformers with `uv sync --all-extras`. Qwen-2.5-VL support is not yet available in the latest release of `transformers` so installation from source is required.
+> **Important:** To serve the model locally, install vLLM and transformers with `uv sync --all-extras`. Qwen-2.5-VL support is not yet available in the latest release of `transformers` so installation from source is required (the appropriate revision is specified in the `pyproject.toml` file).
 
 You can set the `api_base` to point to your local endpoint when calling Proxy Lite:
 
