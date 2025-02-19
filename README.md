@@ -227,9 +227,9 @@ response = client.chat.completions.create(
 ```
 
 The model's response will follow the format of:
-- observe
-- think
-- act
+- Observe
+- Think
+- Act
 ```bash
 <observation>The privacy consent banner has been successfully dismissed, allowing full access to the webpage. The search bar is visible, and the page is ready for interaction.</observation>
 <thinking>The task of finding a vegetarian lasagna recipe has not yet been completed. I now have access to the search bar to begin searching for the recipe. I will type 'vegetarian lasagna' into the search bar and then click the search button to find relevant recipes.</thinking>
