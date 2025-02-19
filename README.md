@@ -99,7 +99,7 @@ vllm serve --model convergence-ai/proxy-lite \
 
 The tool arguments are **very important** for parsing the tool calls from the model appropriately.
 
-> **Important:** To serve the model locally, install vLLM and transformers with `uv sync --all-extras`. Qwen-2.5-VL support is not yet available in the latest release of `transformers` so installation from source is required.
+> **Important:** To serve the model locally, install vLLM and transformers with `uv sync --all-extras`. Qwen-2.5-VL support is not yet available in the latest release of `transformers` so installation from source is required (the appropriate revision is specified in the `pyproject.toml` file).
 
 You can set the `api_base` to point to your local endpoint when calling Proxy Lite:
 
@@ -154,6 +154,92 @@ result = asyncio.run(
 )
 ```
 
+The `Runner` sets the solver and environment off in a loop, like in a traditional reinforcement learning setup.
+
+<div align="center">
+  <img src="assets/loop.png" alt="Runner Loop" width="700" height="auto" style="margin-bottom: 20px;" />
+</div>
+
+
+When it comes to prompting Proxy Lite, the model expects a message history of the form:
+
+```python
+message_history = [
+    {
+        "role": "system", 
+        "content": "You are Proxy Lite...", # Full system prompt in src/proxy_lite/agents/proxy_lite_agent.py
+    }, # System prompt
+    {
+        "role": "user", 
+        "content": "Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm.",
+    }, # Set the task
+    {
+        "role": "user", 
+        "content": [
+            {"type": "image_url", "image_url": {base64_encoded_screenshot} },
+            {"type": "text", "text": "URL: https://www.google.com/ \n- [0] <a>About</a> \n- [1] <a>Store</a>...."}
+        ] # This is the observation from the environment
+    },
+]
+```
+This would then build up the message history, alternating between the assistant (action) and the user (observation), although for new calls, all the last observations other than the current one are discarded.
+
+The chat template will format this automatically, but also expects the appropriate `Tools` to be passed in so that the model is aware of the available actions. You can do this with `transformers`:
+
+```python
+from qwen_vl_utils import process_vision_info
+from transformers import AutoProcessor
+
+from proxy_lite.tools import ReturnValueTool, BrowserTool
+from proxy_lite.serializer import OpenAICompatableSerializer
+
+processor = AutoProcessor.from_pretrained("convergence-ai/proxy-lite")
+tools = OpenAICompatableSerializer().serialize_tools([ReturnValueTool(), BrowserTool(session=None)])
+
+templated_messages = processor.apply_chat_template(
+    message_history, tokenize=False, add_generation_prompt=True, tools=tools
+)
+
+image_inputs, video_inputs = process_vision_info(message_history)
+
+batch = processor(
+    text=[templated_messages],
+    images=image_inputs,
+    videos=video_inputs,
+    padding=True,
+    return_tensors="pt",
+)
+```
+
+Or you can send to the endpoint directly, which will handle the formatting:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="http://convergence-ai-demo-api.hf.space/v1")
+
+response = client.chat.completions.create(
+    model="convergence-ai/proxy-lite",
+    messages=message_history,
+    tools=tools,
+    tool_choice="auto",
+)
+```
+
+The model's response will follow the format of:
+- Observe
+- Think
+- Act
+```bash
+<observation>The privacy consent banner has been successfully dismissed, allowing full access to the webpage. The search bar is visible, and the page is ready for interaction.</observation>
+<thinking>The task of finding a vegetarian lasagna recipe has not yet been completed. I now have access to the search bar to begin searching for the recipe. I will type 'vegetarian lasagna' into the search bar and then click the search button to find relevant recipes.</thinking>
+<tool_call>{"function": "click", "arguments": {"entries": [{"mark_id": 1, "content": "vegetarian lasagna"}]}}</tool_call>
+```
+Where steps are separated by `<observation>`, `<thinking>`, and `<tool_call>` tags (Use the `-tool-call-parser hermes` option with the vLLM server to automatically parse the tool call when getting back the completion).
+
+
+
+
 ### Webbrowser Environment
 
 The `webbrowser` environment is a simple environment that uses the `playwright` library to navigate the web.
@@ -162,8 +248,23 @@ We launch a Chromium browser and navigate to the `homepage` provided in the `Run
 
 Actions in an environment are defined through available tool calls, which in the browser case are set as default in the `BrowserTool` class. This allows the model to click, type, etc. at relevant `mark_id` elements on the page. These elements are extracted using JavaScript injected into the page in order to make interaction easier for the models. 
 
-If you want to not use this set-of-marks approach, you can set the `no_pois_in_image` flag to `True`, and the `include_poi_text` flag to `False` in the `EnvironmentConfig`. This way the model will only see the original image, and not the annotated image with these points-of-interest (POIs). In this case, you would want to update the `BrowserTool` to interact with pixel coordinates instead of the `mark_id`s.
-
-**Note:** We use `playwright_stealth` to lower the chance of detection by anti-bot services, but this isn't foolproof and Proxy Lite may still get blocked with captchas or other anti-bot measures, especially when using the `headless` flag. We recommend using network proxies to avoid this issue.
+**Note:** We use `playwright_stealth` to lower the chance of detection by anti-bot services, but this isn't foolproof and Proxy Lite may still get blocked by captchas or other anti-bot measures, especially when using the `headless` flag. We recommend using network proxies to avoid this issue.
 
 
+## Limitations
+
+This model has not been designed to act as a full assistant able to interact with a user, instead it acts as a tool that goes out and *autonomously* completes a task.
+As such, it will struggle with tasks that require credentials or user interaction such as actually purchasing items if you don't give all the required details in the prompt.
+
+
+## Citation
+
+
+```bibtex
+@article{proxy-lite,
+  title={Proxy Lite - A Mini, Open-weights, Autonomous Assistant},
+  author={Convergence AI},
+  url={https://github.com/convergence-ai/proxy-lite},
+  year={2025}
+}
+```
