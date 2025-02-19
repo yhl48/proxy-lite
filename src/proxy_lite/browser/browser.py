@@ -8,7 +8,7 @@ from typing import Literal, Optional, Self
 import platform
 from playwright.async_api import Browser, BrowserContext, Page, Playwright, async_playwright
 from playwright.async_api import TimeoutError as PlaywrightTimeoutError
-from playwright_stealth import stealth_async
+from playwright_stealth import stealth_async, StealthConfig
 from pydantic import Field
 from tenacity import before_sleep_log, retry, stop_after_delay, wait_exponential
 
@@ -107,7 +107,7 @@ class BrowserSession:
         await self.context.new_page()
         self.context.set_default_timeout(60_000)
         self.current_page.set_default_timeout(60_000)
-        await stealth_async(self.current_page)
+        await stealth_async(self.current_page, StealthConfig(navigator_user_agent=False))
         await self.context.add_init_script(
             path=Path(__file__).with_name("add_custom_select.js"),
         )
