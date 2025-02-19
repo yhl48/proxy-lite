@@ -1,14 +1,14 @@
 import asyncio
 import logging
+import platform
 import re
 from contextlib import AsyncExitStack
 from pathlib import Path
 from typing import Literal, Optional, Self
 
-import platform
 from playwright.async_api import Browser, BrowserContext, Page, Playwright, async_playwright
 from playwright.async_api import TimeoutError as PlaywrightTimeoutError
-from playwright_stealth import stealth_async, StealthConfig
+from playwright_stealth import StealthConfig, stealth_async
 from pydantic import Field
 from tenacity import before_sleep_log, retry, stop_after_delay, wait_exponential
 
@@ -383,12 +383,6 @@ class BrowserSession:
 
 
 if __name__ == "__main__":
-    import json
-
-    test = """{"name": "return_value", "arguments": {'value': 'The most downloaded French speech recognition model on Hugging Face is DeepSeek-R1. Here are its evaluation metrics:\n\n- Claude-3.5-1022: MMLU 88.3, MMLU-Redux 88.9\n- GPT-4.0-5013: MMLU 87.2, MMLU-Redux 88.0\n- DeepSeek-01-3013: MMLU 88.5, MMLU-Redux 89.1\n- OpenAI-01-mini: MMLU 91.0, MMLU-Redux 88.7\n\nPlease see the attached screenshot for more details.'}}"""
-    test = json.loads(test)
-    print(test)
-    exit()
 
     async def dummy_test():
         async with BrowserSession(headless=False) as s:
