@@ -216,7 +216,7 @@ Or you can send to the endpoint directly, which will handle the formatting:
 ```python
 from openai import OpenAI
 
-client = OpenAI(api_base="http://convergence-ai-demo-api.hf.space/v1")
+client = OpenAI(base_url="http://convergence-ai-demo-api.hf.space/v1")
 
 response = client.chat.completions.create(
     model="convergence-ai/proxy-lite",
