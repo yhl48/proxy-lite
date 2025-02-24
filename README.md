@@ -73,7 +73,7 @@ proxy --help
 You can directly run Proxy Lite on a task with:
 
 ```bash
-proxy "Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm."
+proxy "Find some markets near Kings Cross and tell me their ratings."
 ```
 
 Alternatively you can run the local web ui with:
@@ -173,7 +173,7 @@ message_history = [
     }, # System prompt
     {
         "role": "user", 
-        "content": "Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm.",
+        "content": "Find some markets near Kings Cross and tell me their ratings.",
     }, # Set the task
     {
         "role": "user", 
