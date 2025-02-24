@@ -114,6 +114,8 @@ export PROXY_LITE_API_BASE=http://localhost:8008/v1
 
 ## Scaffolding Proxy Lite in Python
 
+If using the model outside the CLI or streamlit app, you can use the `Runner` class to launch the model in a web-browsing environment.
+
 The `RunnerConfig` is how you configure the system setup, including the model used.
 The library is designed to be modular and extendable, making it easy to swap out the environment, solver, or agent.
 
@@ -184,7 +186,7 @@ message_history = [
 ```
 This would then build up the message history, alternating between the assistant (who takes the *action*) and the user (who provides the *observation*).
 
-> *Context-window Management:* When making calls to the model, all the last observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
+> **Context-Window Management:** When making calls to the model, all the last observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
 
 The chat template will format this automatically. You should also pass the `Tools` that the model has access to, these will define the action space available to the model. You can do this with `transformers`:
 
