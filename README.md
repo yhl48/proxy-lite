@@ -3,7 +3,7 @@
   <img src="assets/proxy-lite.png" alt="Proxy Lite logo" width="600" height="auto" style="margin-bottom: 20px;" />
 
   <h2>
-    A mini, open-weights, version of our Proxy assistant.
+    A mini, open-weights, version of <a href="https://proxy.convergence.ai">Proxy</a>.
   </h2>
 
 
@@ -112,10 +112,10 @@ or by setting the environment variable:
 export PROXY_LITE_API_BASE=http://localhost:8008/v1
 ```
 
-### Scaffolding Proxy Lite in Python
+## Scaffolding Proxy Lite in Python
 
-We use the `RunnerConfig` to control the setup of the task.
-The library is designed to be modular and extendable, you can easily swap the environment, solver, or agent.
+The `RunnerConfig` is how you configure the system setup, including the model used.
+The library is designed to be modular and extendable, making it easy to swap out the environment, solver, or agent.
 
 Example:
 ```python
@@ -161,7 +161,7 @@ The `Runner` sets the solver and environment off in a loop, like in a traditiona
 </div>
 
 
-When it comes to prompting Proxy Lite, the model expects a message history of the form:
+Proxy Lite expects the following message format::
 
 ```python
 message_history = [
@@ -182,9 +182,11 @@ message_history = [
     },
 ]
 ```
-This would then build up the message history, alternating between the assistant (action) and the user (observation), although for new calls, all the last observations other than the current one are discarded.
+This would then build up the message history, alternating between the assistant (who takes the *action*) and the user (who provides the *observation*).
 
-The chat template will format this automatically, but also expects the appropriate `Tools` to be passed in so that the model is aware of the available actions. You can do this with `transformers`:
+> *Context-window Management:* When making calls to the model, all the last observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
+
+The chat template will format this automatically. You should also pass the `Tools` that the model has access to, these will define the action space available to the model. You can do this with `transformers`:
 
 ```python
 from qwen_vl_utils import process_vision_info
