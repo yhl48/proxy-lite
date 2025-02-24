@@ -163,7 +163,7 @@ The `Runner` sets the solver and environment off in a loop, like in a traditiona
 </div>
 
 
-Proxy Lite expects the following message format::
+Proxy Lite expects the following message format:
 
 ```python
 message_history = [
