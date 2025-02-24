@@ -260,9 +260,12 @@ Actions in an environment are defined through available tool calls, which in the
 This model has not been designed to act as a full assistant able to interact with a user, instead it acts as a tool that goes out and *autonomously* completes a task.
 As such, it will struggle with tasks that require credentials or user interaction such as actually purchasing items if you don't give all the required details in the prompt.
 
+## Try Proxy
+
+Want to try out the full version of Proxy? Visit [proxy.convergence.ai](https://proxy.convergence.ai) to experience the complete, production-ready autonomous assistant with enhanced capabilities, improved reliability, and support for a wider range of tasks.
+
 
 ## Citation
-
 
 ```bibtex
 @article{proxy-lite,
