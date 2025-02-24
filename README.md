@@ -90,7 +90,7 @@ By default, Proxy Lite will point to an endpoint set up on HuggingFace spaces.
 We recommend hosting your own endpoint with vLLM, you can use the following command:
 
 ```bash
-vllm serve --model convergence-ai/proxy-lite \
+vllm serve --model convergence-ai/proxy-lite-3b \
     --trust-remote-code \
     --enable-auto-tool-choice \
     --tool-call-parser hermes \
@@ -137,7 +137,7 @@ config = RunnerConfig.from_dict(
                 "name": "proxy_lite",
                 "client": {
                     "name": "convergence",
-                    "model_id": "convergence-ai/proxy-lite",
+                    "model_id": "convergence-ai/proxy-lite-3b",
                     "api_base": "https://convergence-ai-demo-api.hf.space/v1",
                 },
             },
@@ -197,7 +197,7 @@ from transformers import AutoProcessor
 from proxy_lite.tools import ReturnValueTool, BrowserTool
 from proxy_lite.serializer import OpenAICompatableSerializer
 
-processor = AutoProcessor.from_pretrained("convergence-ai/proxy-lite")
+processor = AutoProcessor.from_pretrained("convergence-ai/proxy-lite-3b")
 tools = OpenAICompatableSerializer().serialize_tools([ReturnValueTool(), BrowserTool(session=None)])
 
 templated_messages = processor.apply_chat_template(
@@ -223,7 +223,7 @@ from openai import OpenAI
 client = OpenAI(base_url="http://convergence-ai-demo-api.hf.space/v1")
 
 response = client.chat.completions.create(
-    model="convergence-ai/proxy-lite",
+    model="convergence-ai/proxy-lite-3b",
     messages=message_history,
     tools=tools,
     tool_choice="auto",
