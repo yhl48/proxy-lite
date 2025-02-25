@@ -183,7 +183,7 @@ message_history = [
 ```
 This would then build up the message history, alternating between the assistant (who takes the *action*) and the user (who provides the *observation*).
 
-> **Context-Window Management:** When making calls to the model, all the last observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
+> **Context-Window Management:** When making calls to the model, all the observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
 
 The chat template will format this automatically. You should also pass the `Tools` that the model has access to, these will define the action space available to the model. You can do this with `transformers`:
 
