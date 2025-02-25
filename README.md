@@ -24,9 +24,6 @@
   <a href="https://github.com/convergence-ai/proxy-lite/issues/">
     <img src="https://img.shields.io/github/issues/convergence-ai/proxy-lite" alt="open issues" />
   </a>
-  <a href="https://github.com/convergence-ai/proxy-lite/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/convergence-ai/proxy-lite.svg" alt="license" />
-  </a>
 </p>
 
 </div>
@@ -159,7 +156,7 @@ result = asyncio.run(
 The `Runner` sets the solver and environment off in a loop, like in a traditional reinforcement learning setup.
 
 <div align="center">
-  <img src="assets/loop.png" alt="Runner Loop" width="700" height="auto" style="margin-bottom: 20px;" />
+  <img src="assets/loop.png" alt="Runner Loop" width="800" height="auto" style="margin-bottom: 20px;" />
 </div>
 
 
@@ -186,9 +183,9 @@ message_history = [
 ```
 This would then build up the message history, alternating between the assistant (who takes the *action*) and the user (who provides the *observation*).
 
-> **Context-Window Management:** When making calls to the model, all the last observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
+> **Context-Window Management:** When making calls to the model, all the observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
 
-The chat template will format this automatically. You should also pass the `Tools` that the model has access to, these will define the action space available to the model. You can do this with `transformers`:
+You should also pass the `Tools` that the model has access to, these will define the action space available to the model. You can do this with `transformers`:
 
 ```python
 from qwen_vl_utils import process_vision_info

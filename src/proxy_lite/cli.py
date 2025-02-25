@@ -15,6 +15,10 @@ def update_config_from_env(config: RunnerConfig) -> RunnerConfig:
         config.solver.client.api_base = os.getenv("PROXY_LITE_API_BASE")
     if os.getenv("PROXY_LITE_MODEL"):
         config.solver.client.model_id = os.getenv("PROXY_LITE_MODEL")
+    if os.getenv("PROXY_LITE_VIEWPORT_WIDTH"):
+        config.environment.viewport_width = int(os.getenv("PROXY_LITE_VIEWPORT_WIDTH"))
+    if os.getenv("PROXY_LITE_VIEWPORT_HEIGHT"):
+        config.environment.viewport_height = int(os.getenv("PROXY_LITE_VIEWPORT_HEIGHT"))
     return config
 
 
@@ -31,11 +35,11 @@ def do_command(args):
     if args.model:
         config.solver.client.model_id = args.model
     if args.homepage:
-        config.homepage = args.homepage
+        config.environment.homepage = args.homepage
     if args.viewport_width:
-        config.viewport_width = args.viewport_width
+        config.environment.viewport_width = args.viewport_width
     if args.viewport_height:
-        config.viewport_height = args.viewport_height
+        config.environment.viewport_height = args.viewport_height
     o = Runner(config=config)
     result = asyncio.run(o.run(do_text))
 
