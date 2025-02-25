@@ -12,9 +12,9 @@ from proxy_lite.logger import logger
 
 def update_config_from_env(config: RunnerConfig) -> RunnerConfig:
     if os.getenv("PROXY_LITE_API_BASE"):
-        config.solver.client.api_base = os.getenv("PROXY_LITE_API_BASE")
+        config.solver.agent.client.api_base = os.getenv("PROXY_LITE_API_BASE")
     if os.getenv("PROXY_LITE_MODEL"):
-        config.solver.client.model_id = os.getenv("PROXY_LITE_MODEL")
+        config.solver.agent.client.model_id = os.getenv("PROXY_LITE_MODEL")
     if os.getenv("PROXY_LITE_VIEWPORT_WIDTH"):
         config.environment.viewport_width = int(os.getenv("PROXY_LITE_VIEWPORT_WIDTH"))
     if os.getenv("PROXY_LITE_VIEWPORT_HEIGHT"):
@@ -31,9 +31,9 @@ def do_command(args):
     config = update_config_from_env(config)
     # Update config from command-line arguments
     if args.api_base:
-        config.solver.client.api_base = args.api_base
+        config.solver.agent.client.api_base = args.api_base
     if args.model:
-        config.solver.client.model_id = args.model
+        config.solver.agent.client.model_id = args.model
     if args.homepage:
         config.environment.homepage = args.homepage
     if args.viewport_width:
@@ -68,33 +68,33 @@ def main():
     )
     parser.add_argument(
         "--model",
-        type=Optional[str],
+        type=str,
         default=None,
         help="The model to use.",
     )
     parser.add_argument(
         "--api_base",
-        type=Optional[str],
+        type=str,
         default=None,
         help="The API base URL to use.",
     )
     # New option for setting a homepage URL:
     parser.add_argument(
         "--homepage",
-        type=Optional[str],
+        type=str,
         default=None,
         help="The homepage URL to use.",
     )
     # New viewport controls:
     parser.add_argument(
         "--viewport-width",
-        type=Optional[int],
+        type=int,
         default=None,
         help="Viewport width in pixels.",
     )
     parser.add_argument(
         "--viewport-height",
-        type=Optional[int],
+        type=int,
         default=None,
         help="Viewport height in pixels.",
     )
