@@ -156,7 +156,7 @@ result = asyncio.run(
 The `Runner` sets the solver and environment off in a loop, like in a traditional reinforcement learning setup.
 
 <div align="center">
-  <img src="assets/loop.png" alt="Runner Loop" width="700" height="auto" style="margin-bottom: 20px;" />
+  <img src="assets/loop.png" alt="Runner Loop" width="800" height="auto" style="margin-bottom: 20px;" />
 </div>
 
 
