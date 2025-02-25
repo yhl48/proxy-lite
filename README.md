@@ -3,7 +3,7 @@
   <img src="assets/proxy-lite.png" alt="Proxy Lite logo" width="600" height="auto" style="margin-bottom: 20px;" />
 
   <h2>
-    A mini, open-weights, version of our Proxy assistant.
+    A mini, open-weights, version of <a href="https://proxy.convergence.ai">Proxy</a>.
   </h2>
 
 
@@ -73,7 +73,7 @@ proxy --help
 You can directly run Proxy Lite on a task with:
 
 ```bash
-proxy "Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm."
+proxy "Find some markets near Kings Cross and tell me their ratings."
 ```
 
 Alternatively you can run the local web ui with:
@@ -90,7 +90,7 @@ By default, Proxy Lite will point to an endpoint set up on HuggingFace spaces.
 We recommend hosting your own endpoint with vLLM, you can use the following command:
 
 ```bash
-vllm serve --model convergence-ai/proxy-lite \
+vllm serve --model convergence-ai/proxy-lite-3b \
     --trust-remote-code \
     --enable-auto-tool-choice \
     --tool-call-parser hermes \
@@ -112,10 +112,12 @@ or by setting the environment variable:
 export PROXY_LITE_API_BASE=http://localhost:8008/v1
 ```
 
-### Scaffolding Proxy Lite in Python
+## Scaffolding Proxy Lite in Python
 
-We use the `RunnerConfig` to control the setup of the task.
-The library is designed to be modular and extendable, you can easily swap the environment, solver, or agent.
+If using the model outside the CLI or streamlit app, you can use the `Runner` class to launch the model in a web-browsing environment.
+
+The `RunnerConfig` is how you configure the system setup, including the model used.
+The library is designed to be modular and extendable, making it easy to swap out the environment, solver, or agent.
 
 Example:
 ```python
@@ -135,7 +137,7 @@ config = RunnerConfig.from_dict(
                 "name": "proxy_lite",
                 "client": {
                     "name": "convergence",
-                    "model_id": "convergence-ai/proxy-lite",
+                    "model_id": "convergence-ai/proxy-lite-3b",
                     "api_base": "https://convergence-ai-demo-api.hf.space/v1",
                 },
             },
@@ -161,7 +163,7 @@ The `Runner` sets the solver and environment off in a loop, like in a traditiona
 </div>
 
 
-When it comes to prompting Proxy Lite, the model expects a message history of the form:
+Proxy Lite expects the following message format:
 
 ```python
 message_history = [
@@ -171,7 +173,7 @@ message_history = [
     }, # System prompt
     {
         "role": "user", 
-        "content": "Book a table for 2 at an Italian restaurant in Kings Cross tonight at 7pm.",
+        "content": "Find some markets near Kings Cross and tell me their ratings.",
     }, # Set the task
     {
         "role": "user", 
@@ -182,9 +184,11 @@ message_history = [
     },
 ]
 ```
-This would then build up the message history, alternating between the assistant (action) and the user (observation), although for new calls, all the last observations other than the current one are discarded.
+This would then build up the message history, alternating between the assistant (who takes the *action*) and the user (who provides the *observation*).
 
-The chat template will format this automatically, but also expects the appropriate `Tools` to be passed in so that the model is aware of the available actions. You can do this with `transformers`:
+> **Context-Window Management:** When making calls to the model, all the last observations other than the current one are discarded in order to reduce the large number of image tokens required. Since the model responses include reflection on the observations and are all included in the message history, the model is still aware of the entire history when planning new actions.
+
+The chat template will format this automatically. You should also pass the `Tools` that the model has access to, these will define the action space available to the model. You can do this with `transformers`:
 
 ```python
 from qwen_vl_utils import process_vision_info
@@ -193,7 +197,7 @@ from transformers import AutoProcessor
 from proxy_lite.tools import ReturnValueTool, BrowserTool
 from proxy_lite.serializer import OpenAICompatableSerializer
 
-processor = AutoProcessor.from_pretrained("convergence-ai/proxy-lite")
+processor = AutoProcessor.from_pretrained("convergence-ai/proxy-lite-3b")
 tools = OpenAICompatableSerializer().serialize_tools([ReturnValueTool(), BrowserTool(session=None)])
 
 templated_messages = processor.apply_chat_template(
@@ -219,7 +223,7 @@ from openai import OpenAI
 client = OpenAI(base_url="http://convergence-ai-demo-api.hf.space/v1")
 
 response = client.chat.completions.create(
-    model="convergence-ai/proxy-lite",
+    model="convergence-ai/proxy-lite-3b",
     messages=message_history,
     tools=tools,
     tool_choice="auto",
@@ -256,9 +260,12 @@ Actions in an environment are defined through available tool calls, which in the
 This model has not been designed to act as a full assistant able to interact with a user, instead it acts as a tool that goes out and *autonomously* completes a task.
 As such, it will struggle with tasks that require credentials or user interaction such as actually purchasing items if you don't give all the required details in the prompt.
 
+## Try Proxy
+
+Want to try out the full version of Proxy? Visit [proxy.convergence.ai](https://proxy.convergence.ai) to experience the complete, production-ready autonomous assistant with enhanced capabilities, improved reliability, and support for a wider range of tasks.
+
 
 ## Citation
-
 
 ```bibtex
 @article{proxy-lite,

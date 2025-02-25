@@ -28,7 +28,7 @@ def get_user_config(config_expander):
                 "name": "proxy_lite",
                 "client": {
                     "name": "convergence",
-                    "model_id": "convergence-ai/proxy-lite",
+                    "model_id": "convergence-ai/proxy-lite-3b",
                     "api_base": "https://convergence-ai-demo-api.hf.space/v1",
                 },
             },
