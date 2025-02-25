@@ -24,9 +24,6 @@
   <a href="https://github.com/convergence-ai/proxy-lite/issues/">
     <img src="https://img.shields.io/github/issues/convergence-ai/proxy-lite" alt="open issues" />
   </a>
-  <a href="https://github.com/convergence-ai/proxy-lite/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/convergence-ai/proxy-lite.svg" alt="license" />
-  </a>
 </p>
 
 </div>
