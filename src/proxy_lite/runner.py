@@ -3,6 +3,7 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any, Literal, Self
+import json
 
 from omegaconf import OmegaConf
 from pydantic import BaseModel
@@ -97,6 +98,16 @@ class Runner(BaseModel):
             detailed_name=self.config.detailed_logger_name,
         )
 
+    def _is_stuck_in_loop(self, run: Run, last_n: int = 3) -> bool:
+        """Check if the last N observations and actions are repeating"""
+        if len(run.observations) < last_n * 2:
+            return False
+            
+        recent_obs = [o.state.text for o in run.observations[-last_n:]]
+        previous_obs = [o.state.text for o in run.observations[-(last_n*2):-last_n]]
+        
+        return recent_obs == previous_obs
+
     async def run_generator(self, task: str) -> AsyncIterator[Run]:
         async with (
             async_timeout(self.config.task_timeout, "Task"),
@@ -127,9 +138,35 @@ class Runner(BaseModel):
                 await event_queue.put(observation)
                 self.logger.debug("Environment initialised.")
                 step_count = 0
+                consecutive_loops = 0
                 while step_count < self.config.max_steps:
                     event = await event_queue.get()
                     self.logger.debug(f"🤖 [bold purple]Processing event:[/] {event.type}")
+                    
+                    # Check for loops every few steps
+                    if step_count > 0 and step_count % 3 == 0:
+                        if self._is_stuck_in_loop(run):
+                            consecutive_loops += 1
+                            if consecutive_loops >= 2:
+                                self.logger.warning("Detected action loop - forcing task completion")
+                                # Force the agent to return a message about the issue
+                                action = Action(
+                                    text="Unable to complete task - actions are not having the expected effect",
+                                    tool_calls=[{
+                                        "function": {
+                                            "name": "return_value",
+                                            "arguments": json.dumps({
+                                                "value": "I was unable to complete the task because my actions were not having the expected effect. This might be due to website limitations or technical issues."
+                                            })
+                                        }
+                                    }]
+                                )
+                                run.record(action=action)
+                                run.complete = True
+                                break
+                        else:
+                            consecutive_loops = 0
+                        
                     match event.type:
                         case EventType.OBSERVATION:
                             observation: Observation = event

@@ -15,7 +15,11 @@ You will be shown a screen as well as relevant interactable elements highlighted
 You should make observations about the screen, putting them in <observation></observation> tags.
 You should then reason about what needs to be done to complete the task, putting your thoughts in <thinking></thinking> tags.
 You should then use the tools to perform the task, putting the tool calls in <tool_call></tool_call> tags.
-"""  # noqa: E501
+
+IMPORTANT: If an action doesn't produce the expected result after 2-3 attempts:
+1. Try a different approach
+2. If no alternative approaches work, use the return_value tool to explain the issue to the user
+"""
 
 MAX_MESSAGES_FOR_CONTEXT_WINDOW = {
     MessageLabel.SCREENSHOT: 1,
