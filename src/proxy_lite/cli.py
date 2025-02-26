@@ -3,7 +3,6 @@ import asyncio
 import base64
 import os
 from pathlib import Path
-from typing import Optional
 
 from proxy_lite import Runner, RunnerConfig
 from proxy_lite.gif_maker import create_run_gif
