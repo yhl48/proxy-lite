@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import sys
 from typing import Literal
@@ -7,6 +8,18 @@ from rich.logging import RichHandler
 
 
 class StructuredLogger(logging.Logger):
+    async def stream_message(self, message: str) -> None:
+        """Streams the message character by character asynchronously."""
+        try:
+            sys.stdout.write("\r")  # Overwrite current line
+            for char in message:
+                sys.stdout.write(char)
+                sys.stdout.flush()
+                await asyncio.sleep(0.002)
+            sys.stdout.write("\n")
+        except Exception:
+            pass
+
     def _log(
         self,
         level,
@@ -31,6 +44,7 @@ class StructuredLogger(logging.Logger):
             json_fields["exception_message"] = str(exc_value)
 
         json_fields.update(extra)
+
         super()._log(
             level,
             msg,
@@ -50,32 +64,29 @@ def create_logger(
     unique_name = f"{name}-{str(uuid4())[:8]}"
     logger = logging.getLogger(unique_name)
     logger.setLevel(level)
-    handler = RichHandler(
+
+    # Standard RichHandler for structured logs
+    rich_handler = RichHandler(
         rich_tracebacks=True,
         markup=True,
         show_path=False,
         show_time=False,
         log_time_format="[%s]",
     )
+
     if detailed_name:
-        handler.setFormatter(logging.Formatter("%(name)s:\n%(message)s\n------"))
+        rich_handler.setFormatter(logging.Formatter("%(name)s:\n%(message)s"))
     else:
-        handler.setFormatter(logging.Formatter("%(message)s\n------"))
-    logger.addHandler(handler)
+        rich_handler.setFormatter(logging.Formatter("-----\n%(message)s"))
+
+    logger.addHandler(rich_handler)
     logger.propagate = False
+
     return logger
 
 
 # Set StructuredLogger as the default logger class
 logging.setLoggerClass(StructuredLogger)
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.propagate = True
-handler = RichHandler(
-    rich_tracebacks=True,
-    markup=True,
-    show_path=False,
-    show_time=False,
-)
-logger.addHandler(handler)
+# Initialize logger
+logger = create_logger(__name__, level="INFO")
