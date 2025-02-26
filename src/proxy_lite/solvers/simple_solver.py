@@ -2,7 +2,7 @@
 import json
 import re
 from functools import cached_property
-from typing import Any, Coroutine, Literal, Optional
+from typing import Literal, Optional
 
 from proxy_lite.agents import AgentConfigTypes, Agents, BaseAgent
 from proxy_lite.environments.environment_base import Action, Observation
@@ -27,7 +27,6 @@ class SimpleSolverConfig(BaseSolverConfig):
 class SimpleSolver(BaseSolver):
     task: Optional[str] = None
     complete: bool = False
-    coroutines: list[Coroutine[Any, Any, None]] = []
 
     @cached_property
     def tools(self) -> list[Tool]:
@@ -84,7 +83,7 @@ class SimpleSolver(BaseSolver):
 
         self.logger.info("🌐 [bold blue]Observation:[/]")
         # await self.logger.stream_message(observation_content)
-        self.logger._stream_message_sync(observation_content)
+        await self.logger.stream_message(observation_content)
 
         # Extract text between thinking tags if present
         thinking_match = re.search(r"<thinking>(.*?)</thinking>", text_content, re.DOTALL)
@@ -92,7 +91,7 @@ class SimpleSolver(BaseSolver):
 
         self.logger.info("🧠 [bold purple]Thinking:[/]")
         # await self.logger.stream_message(thinking_content)
-        self.logger._stream_message_sync(thinking_content)
+        await self.logger.stream_message(thinking_content)
 
         return Action(tool_calls=message.tool_calls, text=text_content)
 

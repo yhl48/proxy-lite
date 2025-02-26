@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import sys
-import time  # Added for time.sleep
 from typing import Literal
 from uuid import uuid4
 
@@ -9,28 +8,17 @@ from rich.logging import RichHandler
 
 
 class StructuredLogger(logging.Logger):
-    def _stream_message_sync(self, message: str) -> None:
-        """Synchronous version of stream message to run in separate thread."""
+    async def stream_message(self, message: str) -> None:
+        """Streams the message character by character asynchronously."""
         try:
             sys.stdout.write("\r")  # Overwrite current line
             for char in message:
                 sys.stdout.write(char)
                 sys.stdout.flush()
-                time.sleep(0.002)  # Using regular sleep in thread
+                await asyncio.sleep(0.002)
             sys.stdout.write("\n")
         except Exception:
             pass
-
-    async def stream_message(self, message: str) -> None:
-        """Streams the message character by character in a separate thread."""
-        return await asyncio.to_thread(self._stream_message_sync, message)
-
-    # def info_stream(self, msg: str) -> Coroutine[Any, Any, None]:
-    #     """Special method for streaming messages that returns a coroutine."""
-    #     # Log the message normally first
-    #     # self.info(msg)
-    #     # Return the streaming coroutine
-    #     return self.stream_message(msg)
 
     def _log(
         self,
@@ -102,5 +90,3 @@ logging.setLoggerClass(StructuredLogger)
 
 # Initialize logger
 logger = create_logger(__name__, level="INFO")
-
-stream_logger = create_logger(__name__, level="INFO", detailed_name=False)
