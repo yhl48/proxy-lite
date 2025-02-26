@@ -82,7 +82,6 @@ class SimpleSolver(BaseSolver):
         observation_content = observation_match.group(1).strip() if observation_match else ""
 
         self.logger.info("🌐 [bold blue]Observation:[/]")
-        # await self.logger.stream_message(observation_content)
         await self.logger.stream_message(observation_content)
 
         # Extract text between thinking tags if present
@@ -90,7 +89,6 @@ class SimpleSolver(BaseSolver):
         thinking_content = thinking_match.group(1).strip() if thinking_match else text_content
 
         self.logger.info("🧠 [bold purple]Thinking:[/]")
-        # await self.logger.stream_message(thinking_content)
         await self.logger.stream_message(thinking_content)
 
         return Action(tool_calls=message.tool_calls, text=text_content)
