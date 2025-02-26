@@ -1,6 +1,7 @@
 import asyncio
 import base64
 from io import BytesIO
+import time
 
 import streamlit as st
 from PIL import Image
@@ -114,6 +115,7 @@ async def run_task_async(
     history_placeholder,
     config: dict,
 ):
+    start_time = time.time()
     try:
         config = RunnerConfig.from_dict(config)
     except Exception as e:
@@ -178,7 +180,11 @@ async def run_task_async(
                 st.markdown(som)
                 st.write(action)
     action_placeholder.write(" ")
+
+    end_time = time.time()
+    execution_time = end_time - start_time
     status_placeholder.write(f"✨ **Result:** {latest_step}")
+    st.write(f"⏱️ **Task completed in:** {execution_time:.2f} seconds")
 
 
 def main():
