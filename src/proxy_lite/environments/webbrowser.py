@@ -1,4 +1,5 @@
 import base64
+import json
 from functools import cached_property
 from typing import Any, Literal, Optional, Self
 
@@ -10,6 +11,7 @@ from proxy_lite.environments.environment_base import (
     Environments,
     Observation,
     State,
+    ToolCall,
 )
 from proxy_lite.tools import BrowserTool, ReturnValueTool, StructuredDataTool, Tool, ToolExecutionResponse
 
@@ -129,41 +131,80 @@ class WebBrowserEnvironment(BaseEnvironment):
         return True
 
     async def execute_action(self, action: Action) -> Observation:
-        # Check if tables are present but extract_table wasn't called
-        table_count = await self.browser.current_page.evaluate("""
-            () => {
-                const tables = document.querySelectorAll('table');
-                return tables.length;
-            }
-        """)
-        
-        if table_count > 0:
-            # Check if any tool call is extract_table
-            extract_table_called = False
-            if action.tool_calls:
-                for tool_call in action.tool_calls:
-                    if tool_call.function["name"] == "extract_table":
-                        extract_table_called = True
-                        break
-            
-            # If tables exist but extract_table wasn't called, add a warning
-            if not extract_table_called:
-                self.logger.warning("🔴 Tables detected but extract_table tool not used!")
-                # You could even force the agent to use extract_table here
-                # by modifying the action or returning a special observation
-        
         responses = []
         cancelled_tools_flag = False
+        
         if await self.should_perform_action():
+            # Check if tables are present in the full DOM
+            table_elements = await self.browser.current_page.evaluate("""
+                () => {
+                    const tables = document.querySelectorAll('table');
+                    const tableInfo = [];
+                    tables.forEach((table, index) => {
+                        const rect = table.getBoundingClientRect();
+                        tableInfo.push({
+                            index: index,
+                            tag: 'table',
+                            rect: {
+                                x: rect.x,
+                                y: rect.y,
+                                width: rect.width,
+                                height: rect.height
+                            }
+                        });
+                    });
+                    return tableInfo;
+                }
+            """)
+            
+            if table_elements:
+                # Check if any tool call is extract_table
+                extract_table_called = False
+                if action.tool_calls:
+                    for tool_call in action.tool_calls:
+                        if tool_call.function["name"] == "extract_table":
+                            extract_table_called = True
+                            break
+                
+                # If tables exist but extract_table wasn't called, FORCE the use of extract_table
+                if not extract_table_called:
+                    self.logger.warning("🔴 Tables detected but extract_table tool not used - forcing table extraction!")
+                    
+                    # Use the first table found in the DOM
+                    first_table = table_elements[0]
+                    
+                    # Create tool call dictionary
+                    tool_call_dict = {
+                        "id": "forced_extract_table",
+                        "type": "function",
+                        "function": {
+                            "name": "extract_table",
+                            "arguments": json.dumps({  # Convert arguments to JSON string
+                                "mark_id": first_table["index"],
+                                "format": "json"
+                            })
+                        }
+                    }
+                    
+                    # Create proper tool call object
+                    tool_call = ToolCall(**tool_call_dict)
+                    
+                    # Add the extract_table call to the beginning of the tool calls
+                    if not action.tool_calls:
+                        action.tool_calls = [tool_call]
+                    else:
+                        action.tool_calls.insert(0, tool_call)
+                    
+                    self.logger.info(f"🔄 Forcing extract_table tool call for table at index {first_table['index']}")
+
+            # Execute all tool calls in order
             for tool_call in action.tool_calls:
-                # Perform the chosen action
                 try:
-                    tool_response: ToolExecutionResponse = await self.execute_tool(
-                        tool_call,
-                    )
+                    tool_response = await self.execute_tool(tool_call)
                     tool_response.id = tool_call.id
                     responses.append(tool_response)
-                except Exception as e:  # noqa: PERF203
+                    self.logger.info(f"✅ Tool {tool_call.function['name']} executed successfully")
+                except Exception as e:
                     self.logger.warning("🌐 An error occurred taking action: %s", str(e), exc_info=False)
                     tool_response = ToolExecutionResponse(content=str(e), id=tool_call.id)
                     responses.append(tool_response)
