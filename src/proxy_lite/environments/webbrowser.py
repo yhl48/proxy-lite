@@ -204,6 +204,19 @@ class WebBrowserEnvironment(BaseEnvironment):
                     tool_response.id = tool_call.id
                     responses.append(tool_response)
                     self.logger.info(f"✅ Tool {tool_call.function['name']} executed successfully")
+                    
+                    # Debug extract_table output
+                    if tool_call.function["name"] == "extract_table":
+                        self.logger.info(f"📊 Extract table output: {tool_response.content[:500]}...")  # Show first 500 chars
+                        
+                        try:
+                            # Try to parse as JSON to show structured data
+                            table_data = json.loads(tool_response.content)
+                            self.logger.info(f"📋 Parsed table data (first 2 rows): {table_data[:2]}")
+                        except json.JSONDecodeError:
+                            # If not JSON, just show as is
+                            self.logger.info("Table data is not in JSON format")
+                            
                 except Exception as e:
                     self.logger.warning("🌐 An error occurred taking action: %s", str(e), exc_info=False)
                     tool_response = ToolExecutionResponse(content=str(e), id=tool_call.id)

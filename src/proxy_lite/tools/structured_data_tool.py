@@ -24,22 +24,23 @@ class StructuredDataTool(Tool):
     async def extract_table(self, mark_id: int, format: str = "json") -> ToolExecutionResponse:
         """Extract a table from the webpage and convert it to structured format"""
         print(f"DEBUG: extract_table called with mark_id={mark_id}, format={format}")
-        # Get the table element using browser capabilities
+        
+        # Get all tables from the page
         table_html = await self.session.current_page.evaluate("""
-            (mark_id) => {
-                const element = marked_elements_convergence[mark_id];
-                if (element && element.tagName.toLowerCase() === 'table') {
-                    return element.outerHTML;
-                } else {
-                    // Try to find a table inside the element
-                    const table = element.querySelector('table');
-                    return table ? table.outerHTML : null;
+            (index) => {
+                const tables = document.querySelectorAll('table');
+                if (tables.length > 0) {
+                    // Return the table at the specified index
+                    return tables[index]?.outerHTML || null;
                 }
+                return null;
             }
-        """, mark_id)
+        """, mark_id)  # Pass mark_id as the index parameter
         
         if not table_html:
-            return ToolExecutionResponse(content="No table found in the selected element")
+            return ToolExecutionResponse(content=f"No table found at index {mark_id}")
+        
+        print(f"DEBUG: Found table HTML: {table_html[:200]}...")  # Debug first 200 chars
         
         # Use pandas to parse the HTML table
         df = pd.read_html(StringIO(table_html))[0]
@@ -52,4 +53,5 @@ class StructuredDataTool(Tool):
         elif format == "markdown":
             result = df.to_markdown(index=False)
         
+        print(f"DEBUG: Extracted table data: {result[:200]}...")  # Debug first 200 chars
         return ToolExecutionResponse(content=result) 
