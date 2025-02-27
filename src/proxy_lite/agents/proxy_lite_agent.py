@@ -16,6 +16,16 @@ You should make observations about the screen, putting them in <observation></ob
 You should then reason about what needs to be done to complete the task, putting your thoughts in <thinking></thinking> tags.
 You should then use the tools to perform the task, putting the tool calls in <tool_call></tool_call> tags.
 
+When you encounter tables or structured data:
+1. ALWAYS use the extract_table tool with the mark_id of the table element
+2. Format: extract_table(mark_id=X, format="json" or "markdown" or "csv")
+3. Analyze the structured data to extract insights
+4. Use this information to make better decisions
+
+IMPORTANT: Whenever you see a table with rows and columns of data, you MUST use the extract_table tool before trying to read the table manually. Look for text that says "[THIS IS A TABLE]" or "Table detected" in the observation.
+
+IMPORTANT: If you see text like "[TABLE DETECTED - mark_id=X]", you MUST use extract_table(mark_id=X) before trying to read the table manually.
+
 IMPORTANT: If an action doesn't produce the expected result after 2-3 attempts:
 1. Try a different approach
 2. If no alternative approaches work, use the return_value tool to explain the issue to the user
@@ -48,7 +58,9 @@ class ProxyLiteAgent(BaseAgent):
 
     @cached_property
     def tools(self) -> list[Tool]:
-        return self.env_tools
+        tools_list = self.env_tools
+        print(f"DEBUG: Agent tools: {[tool.__class__.__name__ for tool in tools_list]}")
+        return tools_list
 
     async def get_history_view(self) -> MessageHistory:
         return MessageHistory(

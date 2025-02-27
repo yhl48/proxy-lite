@@ -2,6 +2,7 @@ import asyncio
 import base64
 from io import BytesIO
 import time
+import json
 
 import streamlit as st
 from PIL import Image
@@ -152,6 +153,11 @@ async def run_task_async(
     async for run in runner.run_generator(task):
         # Update status with latest step
         if run.actions:
+            for action in run.actions:
+                if action.tool_calls:
+                    for tool_call in action.tool_calls:
+                        tool_name = tool_call.function["name"]
+                        st.write(f"🔧 Using tool: **{tool_name}**")
             latest_step = run.actions[-1].text
             latest_step += "".join(
                 [
@@ -185,6 +191,26 @@ async def run_task_async(
     execution_time = end_time - start_time
     status_placeholder.write(f"✨ **Result:** {latest_step}")
     st.write(f"⏱️ **Task completed in:** {execution_time:.2f} seconds")
+
+    # After the task is complete:
+    tool_usage = {}
+
+    # Use the history we've already collected during the run
+    for action in all_steps:
+        # Parse the tool calls from the action text
+        if "<tool_call>" in action:
+            tool_call_text = action.split("<tool_call>")[1].split("</tool_call>")[0]
+            try:
+                tool_call_data = json.loads(tool_call_text)
+                tool_name = tool_call_data.get("name")
+                if tool_name:
+                    tool_usage[tool_name] = tool_usage.get(tool_name, 0) + 1
+            except json.JSONDecodeError:
+                pass
+
+    st.write("### Tool Usage Summary")
+    for tool, count in tool_usage.items():
+        st.write(f"- {tool}: {count} times")
 
 
 def main():

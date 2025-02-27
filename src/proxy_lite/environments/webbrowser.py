@@ -11,7 +11,7 @@ from proxy_lite.environments.environment_base import (
     Observation,
     State,
 )
-from proxy_lite.tools import BrowserTool, Tool, ToolExecutionResponse
+from proxy_lite.tools import BrowserTool, ReturnValueTool, StructuredDataTool, Tool, ToolExecutionResponse
 
 
 @Environments.register_environment_config("webbrowser")
@@ -64,7 +64,13 @@ class WebBrowserEnvironment(BaseEnvironment):
 
     @cached_property
     def tools(self) -> list[Tool]:
-        return [BrowserTool(session=self.browser)]
+        tools_list = [
+            BrowserTool(session=self.browser),
+            ReturnValueTool(),
+            StructuredDataTool(session=self.browser),
+        ]
+        print(f"DEBUG: Registered tools: {[tool.__class__.__name__ for tool in tools_list]}")
+        return tools_list
 
     @cached_property
     def browser_session(self) -> type[BrowserSession]:
@@ -123,6 +129,29 @@ class WebBrowserEnvironment(BaseEnvironment):
         return True
 
     async def execute_action(self, action: Action) -> Observation:
+        # Check if tables are present but extract_table wasn't called
+        table_count = await self.browser.current_page.evaluate("""
+            () => {
+                const tables = document.querySelectorAll('table');
+                return tables.length;
+            }
+        """)
+        
+        if table_count > 0:
+            # Check if any tool call is extract_table
+            extract_table_called = False
+            if action.tool_calls:
+                for tool_call in action.tool_calls:
+                    if tool_call.function["name"] == "extract_table":
+                        extract_table_called = True
+                        break
+            
+            # If tables exist but extract_table wasn't called, add a warning
+            if not extract_table_called:
+                self.logger.warning("🔴 Tables detected but extract_table tool not used!")
+                # You could even force the agent to use extract_table here
+                # by modifying the action or returning a special observation
+        
         responses = []
         cancelled_tools_flag = False
         if await self.should_perform_action():

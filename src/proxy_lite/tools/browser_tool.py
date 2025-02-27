@@ -139,9 +139,46 @@ class BrowserTool(Tool):
 
     @property
     def poi_text(self) -> str:
-        # Get all points of interest on the page as text
-        texts = [element_as_text(mark_id=i, **element) for i, element in enumerate(self.browser.poi_elements)]
-        # Return formatted text of points of interest on page
+        texts = []
+        table_detected = False
+        print("DEBUG: Checking for tables in POI elements...")
+        
+        # First, check if there are any table elements in the DOM
+        table_count = self.browser.current_page.evaluate("""
+            () => {
+                const tables = document.querySelectorAll('table');
+                return tables.length > 0 ? tables.length : 0;
+            }
+        """)
+        print(f"DEBUG: DOM tables found: {table_count}")
+        
+        # If tables are found, add a VERY prominent message at the beginning of the text
+        if table_count > 0:
+            texts.append("⚠️ TABLES DETECTED ON PAGE - YOU MUST USE extract_table TOOL ⚠️")
+        
+        for i, element in enumerate(self.browser.poi_elements):
+            txt = element_as_text(mark_id=i, **element)
+            
+            # More aggressive table detection
+            is_table = (
+                element.get("tag") == "table" or 
+                "table" in element.get("innerText", "").lower() or
+                element.get("className", "").lower().contains("table") or
+                (element.get("children") and any(child.get("tag") == "table" for child in element.get("children", [])))
+            )
+            
+            if is_table:
+                table_detected = True
+                print(f"DEBUG: Table detected with mark_id={i}")
+                print(f"DEBUG: Table element: {element}")
+                # Make the hint EXTREMELY prominent
+                txt = f"🔴 [TABLE DETECTED - mark_id={i}] 🔴 " + txt
+                txt += f" 🔴 [THIS IS A TABLE. You MUST use extract_table(mark_id={i}) to extract structured data] 🔴"
+            texts.append(txt)
+        
+        if not table_detected:
+            print("DEBUG: No tables detected in POI elements")
+        
         return "\n".join([txt for txt in texts if txt])
 
     @attach_param_schema(GotoParams)

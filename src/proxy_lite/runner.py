@@ -198,6 +198,7 @@ class Runner(BaseModel):
                                 observation: Observation = await environment.execute_action(action)
                                 step_count += 1
                             await event_queue.put(observation)
+                            print(f"DEBUG: Action tool calls: {[tc.function['name'] for tc in action.tool_calls] if action.tool_calls else 'None'}")
                     yield run
                 if not run.complete:
                     self.logger.warning("🤖 [bold purple]Ran out of steps!")

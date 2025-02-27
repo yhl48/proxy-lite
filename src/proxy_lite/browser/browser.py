@@ -185,7 +185,17 @@ class BrowserSession:
         try:
             await self.current_page.wait_for_load_state(timeout=60000)
         except PlaywrightTimeoutError:
-            logger.error(f"Timeout waiting for website load state: {self.current_url}")
+            pass
+        
+        # Check for tables in the DOM
+        table_count = await self.current_page.evaluate("""
+            () => {
+                const tables = document.querySelectorAll('table');
+                return tables.length;
+            }
+        """)
+        print(f"DEBUG: Found {table_count} tables in DOM")
+        
         await self.current_page.wait_for_selector("body", timeout=60000, state="visible")
         # Run the bounding box javascript code to highlight the points of interest on the page
         page_info = await self.current_page.evaluate(
