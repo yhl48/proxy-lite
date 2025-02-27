@@ -22,13 +22,6 @@ When you encounter tables or structured data:
 3. Analyze the structured data to extract insights
 4. Use this information to make better decisions
 
-IMPORTANT: Whenever you see a table with rows and columns of data, you MUST use the extract_table tool before trying to read the table manually. Look for text that says "[THIS IS A TABLE]" or "Table detected" in the observation.
-
-IMPORTANT: If you see text like "[TABLE DETECTED - mark_id=X]", you MUST use extract_table(mark_id=X) before trying to read the table manually.
-
-IMPORTANT: If an action doesn't produce the expected result after 2-3 attempts:
-1. Try a different approach
-2. If no alternative approaches work, use the return_value tool to explain the issue to the user
 """
 
 MAX_MESSAGES_FOR_CONTEXT_WINDOW = {
